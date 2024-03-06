@@ -62,6 +62,9 @@ int main(int argc, char** argv) {
     for (; seq < message_num;) {
         auto msg = std::make_shared<apollo::cyber::examples::cyberrt_test::proto::Frame>();
         msg->set_seq(seq);
+        for (size_t i = 0; i < data_len; ++i) {
+            data[i] = '0';
+        }
         msg->set_text(data);
         // for (size_t i = 0; i < data_len / 2; ++i) {
         //     msg->add_data(1L);

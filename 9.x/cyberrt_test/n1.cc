@@ -58,12 +58,15 @@ int main(int argc, char** argv) {
     uint64_t seq = 0;
     // size_t data_len = 4 * 1024 * 1024;
     char* data = (char*)malloc(data_len);
+    memset(data, 0xff, sizeof(char) * data_len);
     for (; seq < message_num;) {
         auto msg = std::make_shared<apollo::cyber::examples::cyberrt_test::proto::Frame>();
         msg->set_seq(seq);
-        msg->set_write_timestamp(apollo::cyber::Time::Now().ToNanosecond());
-        memset(data, sizeof(char), data_len);
         msg->set_text(data);
+        // for (size_t i = 0; i < data_len / 2; ++i) {
+        //     msg->add_data(1L);
+        // }
+        msg->set_write_timestamp(apollo::cyber::Time::Now().ToNanosecond());
 
         sender->Write(msg);
         ++seq;

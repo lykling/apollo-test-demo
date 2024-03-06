@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.cyber.examples.cyberrt_test.proto;
+
+message Frame {
+  optional uint64 sub_idx = 1;
+  optional uint64 seq = 2;
+  optional uint64 start_write_timestamp = 3;
+  optional uint64 write_timestamp = 4;
+  optional uint64 read_timestamp = 5;
+  optional uint64 end_read_timestamp = 6;
+  optional uint64 data_len = 7;
+  optional uint64 check_sum = 8;
+  optional uint64 write_count = 9;
+  optional uint64 cpu_usage = 10;
+  repeated uint32 data = 11;
+  optional bytes text = 12;
+}

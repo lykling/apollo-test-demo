@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package t1;
+
+message Frame {
+  optional uint32 data_len = 1;
+  optional bytes data = 2;
+  repeated uint32 data2 = 3;
+}

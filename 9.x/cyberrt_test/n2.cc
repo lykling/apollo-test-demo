@@ -39,7 +39,11 @@ int main(int argc, char** argv) {
 
     apollo::cyber::Init(argv[0]);
 
-    auto node = apollo::cyber::CreateNode("n2");
+    std::string node_name = "n2";
+    if (argc > 2) {
+        node_name = argv[2];
+    }
+    auto node = apollo::cyber::CreateNode(node_name);
 
     struct Statis statis = {};
 
@@ -79,6 +83,8 @@ int main(int argc, char** argv) {
     fprintf(stdout, "80_tantile: %lu\n", statis.transmit_time_list[statis.transmit_time_list.size() * 0.80]);
     // 90
     fprintf(stdout, "90_tantile: %lu\n", statis.transmit_time_list[statis.transmit_time_list.size() * 0.90]);
+    // 95
+    fprintf(stdout, "95_tantile: %lu\n", statis.transmit_time_list[statis.transmit_time_list.size() * 0.95]);
     // 99
     fprintf(stdout, "99_tantile: %lu\n", statis.transmit_time_list[statis.transmit_time_list.size() * 0.99]);
     return 0;

@@ -39,6 +39,11 @@ int main(int argc, char** argv) {
     float rate = std::stof(argv[2]);
     // argv[3] --> data_size
     size_t data_len = std::stol(argv[3]);
+    // argv[4] --> flag_using_bytes
+    long flag_using_bytes = 0;
+    if (argc > 4) {
+        flag_using_bytes = std::stol(argv[4]);
+    }
 
     auto node = apollo::cyber::CreateNode("n1");
 
@@ -58,17 +63,24 @@ int main(int argc, char** argv) {
     uint64_t seq = 0;
     // size_t data_len = 4 * 1024 * 1024;
     char* data = (char*)malloc(data_len);
-    memset(data, 0xff, sizeof(char) * data_len);
+    memset(data, 0x00, sizeof(char) * data_len);
+    srand(time(NULL));
+    for (size_t i = 0; i < data_len / 4; ++i) {
+        data[i * 4] = rand() % 0xff;
+        data[i * 4 + 1] = rand() % 0xff;
+        data[i * 4 + 2] = rand() % 0xff;
+        data[i * 4 + 3] = rand() % 0xff;
+    }
     for (; seq < message_num;) {
         auto msg = std::make_shared<apollo::cyber::examples::cyberrt_test::proto::Frame>();
         msg->set_seq(seq);
-        for (size_t i = 0; i < data_len; ++i) {
-            data[i] = '0';
+        if (flag_using_bytes) {
+            msg->set_text(std::string(data, data_len));
+        } else {
+            for (size_t i = 0; i < data_len / 4; ++i) {
+                msg->add_data(*(uint32_t*)(data + i * 4));
+            }
         }
-        msg->set_text(data);
-        // for (size_t i = 0; i < data_len / 2; ++i) {
-        //     msg->add_data(1L);
-        // }
         msg->set_write_timestamp(apollo::cyber::Time::Now().ToNanosecond());
 
         sender->Write(msg);

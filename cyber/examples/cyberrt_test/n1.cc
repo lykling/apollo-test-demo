@@ -17,12 +17,14 @@
 #include <ctime>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 #include "cyber/examples/cyberrt_test/proto/msg.pb.h"
 
 #include "cyber/cyber.h"
 #include "cyber/time/rate.h"
 #include "cyber/time/time.h"
+#include "cyber/common/global_data.h"
 
 uint32_t random_uint32() {
     return rand();
@@ -45,6 +47,9 @@ int main(int argc, char** argv) {
         flag_using_bytes = std::stol(argv[4]);
     }
 
+    auto config = apollo::cyber::common::GlobalData::Instance()->Config();
+    fprintf(stderr, "config: %s\n", config.DebugString().c_str());
+
     auto node = apollo::cyber::CreateNode("n1");
 
     apollo::cyber::proto::RoleAttributes attrs;
@@ -61,23 +66,50 @@ int main(int argc, char** argv) {
 
     apollo::cyber::Rate rate_ctl(rate);
     uint64_t seq = 0;
-    // size_t data_len = 4 * 1024 * 1024;
-    char* data = (char*)malloc(data_len);
-    memset(data, 0x00, sizeof(char) * data_len);
-    srand(time(NULL));
-    for (size_t i = 0; i < data_len / 4; ++i) {
-        data[i * 4] = rand() % 0xff;
-        data[i * 4 + 1] = rand() % 0xff;
-        data[i * 4 + 2] = rand() % 0xff;
-        data[i * 4 + 3] = rand() % 0xff;
+
+    // points data
+    std::vector<apollo::cyber::examples::cyberrt_test::proto::Point> points;
+    for (size_t i = 0; i < data_len; ++i) {
+        apollo::cyber::examples::cyberrt_test::proto::Point point;
+        point.set_x(1039.1139);
+        point.set_y(1039.1139);
+        point.set_z(1039.1139);
+        point.set_i(1);
+        point.set_t(1657324662872342528);
+        points.emplace_back(point);
     }
+
+    // float * 3 + uint32 * 1 + uint64 * 1 = 24 bytes
+    char* data = (char*)malloc(data_len * sizeof(char) * 24);
+    memset(data, 0x00, sizeof(char) * data_len * 24);
+    srand(time(NULL));
+    for (size_t i = 0; i < data_len; ++i) {
+        // data[i * 4] = rand() % 0xff;
+        // data[i * 4 + 1] = rand() % 0xff;
+        // data[i * 4 + 2] = rand() % 0xff;
+        // data[i * 4 + 3] = rand() % 0xff;
+        // data[i * 4] = 0xff;
+        // data[i * 4 + 1] = 0xff;
+        // data[i * 4 + 2] = 0xff;
+        // data[i * 4 + 3] = 0xff;
+        *(float*)(data + i * 24 + 0) = 1039.1139;
+        *(float*)(data + i * 24 + 4) = 1039.1139;
+        *(float*)(data + i * 24 + 8) = 1039.1139;
+        *(uint32_t*)(data + i * 24 + 12) = 0x0f;
+        *(uint64_t*)(data + i * 24 + 16) = 1657324662872342528;
+    }
+
     for (; seq < message_num;) {
         auto msg = std::make_shared<apollo::cyber::examples::cyberrt_test::proto::Frame>();
         msg->set_seq(seq);
-        if (flag_using_bytes) {
-            msg->set_text(std::string(data, data_len));
+        if (flag_using_bytes == 1) {
+            msg->set_text(std::string(data, data_len * 24));
+        } else if (flag_using_bytes == 2) {
+            for (size_t i = 0; i < data_len; ++i) {
+                msg->add_points()->CopyFrom(points[i]);
+            }
         } else {
-            for (size_t i = 0; i < data_len / 4; ++i) {
+            for (size_t i = 0; i < data_len * 6; ++i) {
                 msg->add_data(*(uint32_t*)(data + i * 4));
             }
         }

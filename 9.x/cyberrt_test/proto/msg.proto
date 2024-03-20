@@ -2,6 +2,14 @@ syntax = "proto2";
 
 package apollo.cyber.examples.cyberrt_test.proto;
 
+message Point {
+  optional float x = 1;
+  optional float y = 2;
+  optional float z = 3;
+  optional uint32 i = 4;
+  optional uint64 t = 5;
+}
+
 message Frame {
   optional uint64 sub_idx = 1;
   optional uint64 seq = 2;
@@ -15,4 +23,5 @@ message Frame {
   optional uint64 cpu_usage = 10;
   repeated uint32 data = 11;
   optional bytes text = 12;
+  repeated Point points = 13;
 }

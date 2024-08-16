@@ -1,0 +1,17 @@
+[
+  {
+    "directory": ".",
+    "command": "g++ -I. -g -fPIC -pthread -c shm_pthread_rwlock_w.cc -o shm_pthread_rwlock_w.o",
+    "file": "shm_pthread_rwlock_w.o"
+  },
+  {
+    "directory": ".",
+    "command": "g++ -I. -g -fPIC -pthread -c common.cc -o common.o",
+    "file": "common.o"
+  },
+  {
+    "directory": ".",
+    "command": "g++ -I. -g -fPIC -pthread -c shm_pthread_rwlock_r.cc -o shm_pthread_rwlock_r.o",
+    "file": "shm_pthread_rwlock_r.o"
+  }
+]

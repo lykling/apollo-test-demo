@@ -105,6 +105,20 @@ void Notifier::poll(NotifyEvent* event) {
     }
 }
 
+Rate::Rate(double frequency) {
+    duration_ = std::chrono::duration<double>(1.0 / frequency);
+    last_time_ = std::chrono::steady_clock::now();
+}
+
+void Rate::sleep() {
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed = now - last_time_;
+    if (elapsed < duration_) {
+        std::this_thread::sleep_for(duration_ - elapsed);
+    }
+    last_time_ = std::chrono::steady_clock::now();
+}
+
 }  // namespace common
 }  // namespace lab
 }  // namespace apollo
